@@ -11,9 +11,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.note.common.HTTPCodeStatus;
 import com.note.model.note.Category;
+import com.note.model.user.User;
 import com.note.service.note.CategoryServices;
 import com.note.web.controller.BaseController;
 import com.note.web.entity.ResponseEntity;
+import com.note.web.security.annotation.Authority;
+import com.note.web.security.common.AuthorityType;
+import com.note.web.security.util.SecurityUtil;
 
 @SuppressWarnings("rawtypes")
 @Controller
@@ -32,6 +36,16 @@ public class CategoryController extends BaseController {
 		page.setResult(tags);
 		page.setPageSize(tags.size());
 		return returnSuccess(HTTPCodeStatus.HTTPCODE_OK, page, HTTPCodeStatus.HTTPCODE_OK_MESSAGE);
+	}
+	
+	@ResponseBody
+	@RequestMapping(method = RequestMethod.GET)
+	@Authority(type = AuthorityType.SECURITY)
+	public ResponseEntity listByUser(){
+		User user = SecurityUtil.currentLogin();
+		int id = user.getId();
+		
+		return returnSuccess(null);
 	}
 }
  
