@@ -1,4 +1,4 @@
-package com.note.web.controller.note;
+package com.note.web.controller.category;
 
 import java.util.List;
 
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.note.common.HTTPCodeStatus;
-import com.note.model.note.Category;
+import com.note.model.category.Category;
 import com.note.model.user.User;
-import com.note.service.note.CategoryServices;
+import com.note.service.category.CategoryServices;
 import com.note.web.controller.BaseController;
 import com.note.web.entity.ResponseEntity;
 import com.note.web.security.annotation.Authority;
@@ -44,8 +44,10 @@ public class CategoryController extends BaseController {
 	public ResponseEntity listByUser(){
 		User user = SecurityUtil.currentLogin();
 		int id = user.getId();
-		
-		return returnSuccess(null);
+		List<Category> tags = categoryService.listByUserId(id);
+		page.setResult(tags);
+		page.setPageSize(tags.size());
+		return returnSuccess(HTTPCodeStatus.HTTPCODE_OK, page, HTTPCodeStatus.HTTPCODE_OK_MESSAGE);
 	}
 }
  

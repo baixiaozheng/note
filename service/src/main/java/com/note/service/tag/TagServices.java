@@ -1,8 +1,8 @@
-package com.note.service.note;
+package com.note.service.tag;
 
 import java.util.List;
 
-import com.note.model.note.Tag;
+import com.note.model.tag.Tag;
 
 /**
  * 标签service

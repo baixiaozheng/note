@@ -1,4 +1,4 @@
-package com.note.service.note.impl;
+package com.note.service.category.impl;
 
 import java.util.List;
 
@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.note.dao.note.CategoryDao;
-import com.note.model.note.Category;
-import com.note.service.note.CategoryServices;
+import com.note.dao.category.CategoryDao;
+import com.note.model.category.Category;
+import com.note.service.category.CategoryServices;
 
 @Service(value = "categoryService")
 public class CategoryServiceImpl implements CategoryServices {
@@ -24,5 +24,10 @@ public class CategoryServiceImpl implements CategoryServices {
 		return categoryDao.list();
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	public List<Category> listByUserId(int userId) {
+		return categoryDao.listByUserId(userId);
+	}
 }
  

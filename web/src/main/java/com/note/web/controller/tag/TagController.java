@@ -1,4 +1,4 @@
-package com.note.web.controller.note;
+package com.note.web.controller.tag;
 
 import java.util.List;
 
@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.note.common.HTTPCodeStatus;
-import com.note.model.note.Tag;
-import com.note.service.note.TagServices;
+import com.note.model.tag.Tag;
+import com.note.service.tag.TagServices;
 import com.note.web.controller.BaseController;
 import com.note.web.entity.ResponseEntity;
 

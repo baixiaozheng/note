@@ -1,4 +1,4 @@
-package com.note.model.note; 
+package com.note.model.tag; 
 
 import java.io.Serializable;
 import java.util.Date;

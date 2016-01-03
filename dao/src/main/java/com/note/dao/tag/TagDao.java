@@ -1,11 +1,11 @@
-package com.note.dao.note;
+package com.note.dao.tag;
 
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
 import com.note.dao.BaseDao;
-import com.note.model.note.Tag;
+import com.note.model.tag.Tag;
 
 /**
  * 标签dao

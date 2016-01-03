@@ -1,4 +1,4 @@
-package com.note.service.note.impl;
+package com.note.service.tag.impl;
 
 import java.util.List;
 
@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.note.dao.note.TagDao;
-import com.note.model.note.Tag;
-import com.note.service.note.TagServices;
+import com.note.dao.tag.TagDao;
+import com.note.model.tag.Tag;
+import com.note.service.tag.TagServices;
 
 @Service(value = "tagService")
 public class TagServiceImpl implements TagServices {

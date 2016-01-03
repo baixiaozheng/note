@@ -1,4 +1,4 @@
-package com.note.dao.note;
+package com.note.dao.category;
 
 import java.util.List;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Repository;
 
 import com.note.dao.BaseDao;
-import com.note.model.note.Category;
+import com.note.model.category.Category;
 
 /**
  * 分类dao
