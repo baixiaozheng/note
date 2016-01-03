@@ -20,5 +20,15 @@ public interface TagServices {
 	 * @Date 2015年12月17日 下午11:33:33
 	 */
 	List<Tag> list();
+
+	/**
+	 * 根据用户id查询可用标签
+	 * 
+	 * @param userId
+	 * @return
+	 * @author baixiaozheng
+	 * @Date 2016年1月3日 下午12:23:59
+	 */
+	List<Tag> listByUserId(int userId);
 }
  

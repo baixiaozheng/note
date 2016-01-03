@@ -23,6 +23,12 @@ public class TagServiceImpl implements TagServices {
 	public List<Tag> list() {
 		return tagDao.list();
 	}
+	
+	@Override
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	public List<Tag> listByUserId(int userId) {
+		return tagDao.listByUserId(userId);
+	}
 
 }
  

@@ -30,13 +30,14 @@ public class CategoryController extends BaseController {
 
 	
 	@ResponseBody
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, value = "list")
 	public ResponseEntity list(){
-		List<Category> tags = categoryService.list();
-		page.setResult(tags);
-		page.setPageSize(tags.size());
+		List<Category> categories = categoryService.list();
+		page.setResult(categories);
+		page.setPageSize(categories.size());
 		return returnSuccess(HTTPCodeStatus.HTTPCODE_OK, page, HTTPCodeStatus.HTTPCODE_OK_MESSAGE);
 	}
+	
 	
 	@ResponseBody
 	@RequestMapping(method = RequestMethod.GET)
@@ -44,9 +45,9 @@ public class CategoryController extends BaseController {
 	public ResponseEntity listByUser(){
 		User user = SecurityUtil.currentLogin();
 		int id = user.getId();
-		List<Category> tags = categoryService.listByUserId(id);
-		page.setResult(tags);
-		page.setPageSize(tags.size());
+		List<Category> categories = categoryService.listByUserId(id);
+		page.setResult(categories);
+		page.setPageSize(categories.size());
 		return returnSuccess(HTTPCodeStatus.HTTPCODE_OK, page, HTTPCodeStatus.HTTPCODE_OK_MESSAGE);
 	}
 }
