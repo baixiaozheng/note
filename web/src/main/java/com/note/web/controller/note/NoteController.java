@@ -1,7 +1,19 @@
 package com.note.web.controller.note;
 
-import javax.annotation.Resource;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URLEncoder;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.poifs.filesystem.DirectoryEntry;
+import org.apache.poi.poifs.filesystem.DocumentEntry;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.ietf.jgss.Oid;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -96,4 +108,55 @@ public class NoteController extends BaseController {
     	noteService.update(note);
     	return returnSuccess(HTTPCodeStatus.HTTPCODE_OK, note);
     }
+    
+    @RequestMapping(value="/export/{id}", method = RequestMethod.GET)
+    public void export(HttpServletResponse response, @PathVariable("id") Integer id) throws IOException{
+    	Note note = noteService.getById(id);
+    	response.reset();  
+    	response.setContentType("application/vnd.ms-word;charset=UTF-8");  
+          
+        String strFileName = note.getTitle();
+        strFileName = URLEncoder.encode(strFileName, "UTF-8");  
+        String guessCharset = "gb2312";  
+        strFileName = new String(strFileName.getBytes(guessCharset), "ISO8859-1");  
+  
+        response.setHeader("Content-Disposition", "attachment;filename=" + strFileName + ".doc");  
+          
+        OutputStream os = response.getOutputStream();  
+        os.write(note.getContent().getBytes(), 0, note.getContent().getBytes().length);  
+        os.flush();  
+        os.close();       
+    }
+    
+    @RequestMapping(value="/exp/{id}", method = RequestMethod.GET)
+    public void writeWordFile(@PathVariable("id") Integer id) throws Exception {
+        boolean flag = false;
+        ByteArrayInputStream bais = null;
+        FileOutputStream fos = null;
+        String path = "C:/";  //根据实际情况写路径
+        try {
+               if (!"".equals(path)) {
+                      File fileDir = new File(path);
+                      if (fileDir.exists()) {
+                             String content = noteService.getById(id).getContent();
+                             byte b[] = content.getBytes();
+                             bais = new ByteArrayInputStream(b);
+                             POIFSFileSystem poifs = new POIFSFileSystem();
+                             DirectoryEntry directory = poifs.getRoot();
+                             DocumentEntry documentEntry = directory.createDocument("WordDocument", bais);
+                             fos = new FileOutputStream(path + "temp.doc");
+                             poifs.writeFilesystem(fos);
+                             bais.close();
+                             fos.close();
+                      }
+               }
+
+        } catch (IOException e) {
+               e.printStackTrace();
+        } finally {
+               if(fos != null) fos.close();
+               if(bais != null) bais.close();
+        }
+ }
+
 }
