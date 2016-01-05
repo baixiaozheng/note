@@ -1,19 +1,15 @@
 package com.note.web.controller.note;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.ietf.jgss.Oid;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +21,7 @@ import com.note.common.Page;
 import com.note.model.note.Note;
 import com.note.model.user.User;
 import com.note.service.note.NoteServices;
+import com.note.util.pdf.PdfExportUtil;
 import com.note.web.controller.BaseController;
 import com.note.web.entity.ResponseEntity;
 import com.note.web.security.annotation.Authority;
@@ -129,34 +126,39 @@ public class NoteController extends BaseController {
     }
     
     @RequestMapping(value="/exp/{id}", method = RequestMethod.GET)
-    public void writeWordFile(@PathVariable("id") Integer id) throws Exception {
-        boolean flag = false;
-        ByteArrayInputStream bais = null;
-        FileOutputStream fos = null;
-        String path = "C:/";  //根据实际情况写路径
-        try {
-               if (!"".equals(path)) {
-                      File fileDir = new File(path);
-                      if (fileDir.exists()) {
-                             String content = noteService.getById(id).getContent();
-                             byte b[] = content.getBytes();
-                             bais = new ByteArrayInputStream(b);
-                             POIFSFileSystem poifs = new POIFSFileSystem();
-                             DirectoryEntry directory = poifs.getRoot();
-                             DocumentEntry documentEntry = directory.createDocument("WordDocument", bais);
-                             fos = new FileOutputStream(path + "temp.doc");
-                             poifs.writeFilesystem(fos);
-                             bais.close();
-                             fos.close();
-                      }
-               }
+    public void exp(HttpServletResponse response, @PathVariable("id") Integer id) throws IOException{
+    	Map<String, Object> dataMap = new HashMap<String, Object>();  
+    	Note note = noteService.getById(id);
+    	dataMap.put("title", note.getTitle());
+    	dataMap.put("date", note.getCreateTime());
+    	dataMap.put("content", "1111111111");
+    	DocumentUtil documentUtil = new DocumentUtil();
+    	documentUtil.createDoc(dataMap, "/Users/baixiaozheng/Downloads/aa.doc");
+    }
+    
 
-        } catch (IOException e) {
-               e.printStackTrace();
-        } finally {
-               if(fos != null) fos.close();
-               if(bais != null) bais.close();
-        }
- }
+    @RequestMapping(value="/exppdf/{id}", method = RequestMethod.GET)
+    public void expPDF(HttpServletResponse response, @PathVariable("id") Integer id) throws Exception{
+    	Note note = noteService.getById(id);
+    	
+          
+        InputStream is = PdfExportUtil.htmlToPdf(note.getContent(), "", "");
+        byte[] buffer = new byte[is.available()];
+        is.read(buffer);
+        is.close();
+        response.reset();  
+    	response.setContentType("application/vnd.ms-word;charset=UTF-8");  
+    	String strFileName = note.getTitle();
+        strFileName = URLEncoder.encode(strFileName, "UTF-8");  
+        String guessCharset = "gb2312";  
+        strFileName = new String(strFileName.getBytes(guessCharset), "ISO8859-1");  
+  
+        response.setHeader("Content-Disposition", "attachment;filename=" + strFileName + ".pdf");    
+          
+        OutputStream os = response.getOutputStream();  
+        os.write(buffer);  
+        os.flush();  
+        os.close();       
+    }
 
 }
