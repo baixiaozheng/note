@@ -142,17 +142,17 @@ public class NoteController extends BaseController {
     	Note note = noteService.getById(id);
     	
           
-        InputStream is = PdfExportUtil.htmlToPdf(note.getContent(), "", "");
+        InputStream is = PdfExportUtil.htmlToPdf(note.getContent(), "", note.getTitle());
         byte[] buffer = new byte[is.available()];
         is.read(buffer);
         is.close();
         response.reset();  
-    	response.setContentType("application/vnd.ms-word;charset=UTF-8");  
     	String strFileName = note.getTitle();
-        strFileName = URLEncoder.encode(strFileName, "UTF-8");  
-        String guessCharset = "gb2312";  
-        strFileName = new String(strFileName.getBytes(guessCharset), "ISO8859-1");  
-  
+        if (request.getHeader("User-Agent").toUpperCase().indexOf("MSIE") > 0) {  
+        	strFileName = URLEncoder.encode(strFileName, "UTF-8");  
+        } else {  
+        	strFileName = new String(strFileName.getBytes("UTF-8"), "ISO8859-1");  
+        } 
         response.setHeader("Content-Disposition", "attachment;filename=" + strFileName + ".pdf");    
           
         OutputStream os = response.getOutputStream();  

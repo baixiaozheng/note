@@ -51,7 +51,7 @@ public class Comment implements Serializable {
 	/**
 	 * 父评论id（若此条评论为回复，被回复的评论的id）
 	 */
-	@Column(name = "parent_id", columnDefinition = "default 0")
+	@Column(name = "parent_id", columnDefinition = "int default 0")
 	private Integer parentId;
 	
 	/**
