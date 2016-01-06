@@ -23,7 +23,7 @@ public class CommentServiceImpl implements CommentServices {
 
 	@Resource(name = "commentDao")
 	private CommentDao commentDao;
-	
+
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = java.lang.RuntimeException.class)
 	public Comment add(Comment comment) {
@@ -37,7 +37,7 @@ public class CommentServiceImpl implements CommentServices {
 	}
 
 	@Override
-	 @Transactional(propagation = Propagation.NOT_SUPPORTED)
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public Comment getById(int id) {
 		return commentDao.getById(id);
 	}
@@ -61,7 +61,7 @@ public class CommentServiceImpl implements CommentServices {
 	}
 
 	@Override
-	 @Transactional(propagation = Propagation.NOT_SUPPORTED)
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public List<Comment> listByNoteId(int noteId, Boolean enable, Boolean publish) {
 		return commentDao.listByNoteId(noteId, enable, publish);
 	}
