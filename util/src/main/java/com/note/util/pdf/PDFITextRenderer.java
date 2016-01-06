@@ -50,8 +50,11 @@ import org.xml.sax.InputSource;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.PdfWriter;
 
+@SuppressWarnings("rawtypes")
 public class PDFITextRenderer extends ITextRenderer {
+	@SuppressWarnings("unused")
 	private static final float DEFAULT_DOTS_PER_POINT = 26.666666F;
+	@SuppressWarnings("unused")
 	private static final int DEFAULT_DOTS_PER_PIXEL = 20;
 	private final SharedContext _sharedContext;
 	private final ITextOutputDevice _outputDevice;
