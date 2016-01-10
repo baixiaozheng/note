@@ -30,4 +30,10 @@ public class CommentController extends BaseController {
 	public ResponseEntity list(){
 		return returnSuccess(HTTPCodeStatus.HTTPCODE_OK, page, HTTPCodeStatus.HTTPCODE_OK_MESSAGE);
 	}
+	
+	@ResponseBody
+    @RequestMapping(method = RequestMethod.POST)
+	public ResponseEntity add(){
+		return returnSuccess(HTTPCodeStatus.HTTPCODE_OK, page, HTTPCodeStatus.HTTPCODE_OK_MESSAGE);
+	}
 }
