@@ -28,7 +28,7 @@ import com.note.common.AuthConf;
 /**
  * Servlet Filter implementation class AuthFilter
  */
-//@WebFilter(filterName="/AuthFilter",urlPatterns="/*")
+@WebFilter(filterName="/AuthFilter",urlPatterns="/*")
 public class AuthFilter implements Filter {
 
 	/**

@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.note.common.AuthConf;
 import com.note.model.user.User;
+import com.note.service.user.UserServices;
 import com.note.util.des.DESUtils;
+import com.note.util.validate.ValidateUtil;
 
 @Controller
 public class AuthController {
@@ -29,6 +31,9 @@ public class AuthController {
 	private RedisTemplate<String, User> redisTemplate;
 	
 	private ValueOperations<String, User> userOperations;
+	
+	@Resource(name="userService")
+	private UserServices userService;
 
 	@RequestMapping(value = "preLogin")
 	public void preLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -94,16 +99,18 @@ public class AuthController {
 	public void doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
-		
-		if(!(username.equals("zhangsan")&&password.equals("zhangsan"))) {
+		User user = null;
+		if (ValidateUtil.isMail(username)) {
+			user = userService.getUserByEmail(username);
+		} else if (ValidateUtil.isMobile(username)) {
+			user = userService.getUserByMobile(username);
+		}
+		// pwd是请求来的用户密码的MD5摘要
+		if (user == null || password == null || "".equals(password) || !password.equals(user.getPassword()) || !user.getEnable()) {
 			request.getRequestDispatcher("login.jsp?errorInfo=username or password is wrong!").forward(request, response);
 		} else {
 			String token = generateStrRecaptcha(16);
 			String encodedToken = DESUtils.encrypt(token, AuthConf.SECRET_KEY);
-			User user = new User();
-			user.setId(1);
-			user.setRealName(username);
-			user.setPassword(password);
 			userOperations = redisTemplate.opsForValue();
 			userOperations.set(token, user, 30, TimeUnit.MINUTES);
 			addCookie(response, AuthConf.COOKIE_NAME, encodedToken, AuthConf.TOKEN_TIMEOUT);

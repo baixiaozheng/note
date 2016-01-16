@@ -14,5 +14,5 @@ public class AuthConf {
 	
 	public static final String SECRET_KEY = "3dqYp97xiBni5geNpvcCW293"; // des key
 	
-	public static final String SSO_SERVICE = "http://passport.com:8080/auth/"; //认证系统url
+	public static final String SSO_SERVICE = "http://192.168.0.11:8888/auth/"; //认证系统url
 }
