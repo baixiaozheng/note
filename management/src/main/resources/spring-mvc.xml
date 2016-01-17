@@ -35,6 +35,6 @@
 		<property name="suffix" value=".jsp" />
 	</bean>
 	<mvc:interceptors>
-        <bean class="com.note.web.security.interceptor.AuthorityInterceptor"/>
+        <bean class="com.note.management.security.interceptor.AuthorityInterceptor"/>
     </mvc:interceptors>
 </beans>

@@ -22,6 +22,7 @@ import com.note.common.AuthConf;
 import com.note.model.user.User;
 import com.note.service.user.UserServices;
 import com.note.util.des.DESUtils;
+import com.note.util.md5.MD5Util;
 import com.note.util.validate.ValidateUtil;
 
 @Controller
@@ -106,7 +107,7 @@ public class AuthController {
 			user = userService.getUserByMobile(username);
 		}
 		// pwd是请求来的用户密码的MD5摘要
-		if (user == null || password == null || "".equals(password) || !password.equals(user.getPassword()) || !user.getEnable()) {
+		if (user == null || password == null || "".equals(password) || !MD5Util.digest(password).equals(user.getPassword()) || !user.getEnable()) {
 			request.getRequestDispatcher("login.jsp?errorInfo=username or password is wrong!").forward(request, response);
 		} else {
 			String token = generateStrRecaptcha(16);
