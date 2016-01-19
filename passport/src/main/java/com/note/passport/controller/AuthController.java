@@ -13,12 +13,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONObject;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.note.common.AuthConf;
 import com.note.model.user.User;
 import com.note.service.user.UserServices;
@@ -70,11 +70,9 @@ public class AuthController {
 			userOperations = redisTemplate.opsForValue();
 			User user = userOperations.get(decodedToken);
 			if (user != null) {// 判断token是否存在
-				
-				JSONObject userjson = new JSONObject(user);
+				ObjectMapper mapper = new ObjectMapper();  
 				//result.append("{\"error\":false,\"username\":").append(user.getRealName()+"}");
-				result.append("{\"error\":false,\"errorInfo\":\"Token is not found!\",\"user\":" + userjson.toString() + "}");
-				result.append(userjson.toString());
+				result.append("{\"error\":false,\"errorInfo\":\"\",\"user\":" + mapper.writeValueAsString(user) + "}");
 			}
 			else {
 				result.append("{\"error\":true,\"errorInfo\":\"Token is not found!\"}");

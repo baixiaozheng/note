@@ -3,8 +3,8 @@ package com.note.management.security.interceptor;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 
-import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +27,6 @@ import com.note.common.HTTPCodeStatus;
 import com.note.management.entity.ResponseEntity;
 import com.note.management.security.annotation.Authority;
 import com.note.management.security.common.AuthorityType;
-import com.note.management.security.util.SecurityUtil;
 import com.note.model.user.User;
 import com.note.util.cookie.CookieUtil;
 
@@ -60,19 +59,7 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 				|| uri.contains("/html") || uri.contains("/index.html") || uri.contains("/login")) {
 			return true;
 		}
-		String path = request.getContextPath();
-		String gotoURL = request.getParameter("gotoURL");
-		if (gotoURL == null) {
-			gotoURL = request.getRequestURL().toString();
-		}
-		String URL = AuthConf.SSO_SERVICE + "preLogin?setCookieURL=" + request.getScheme() + "://"
-				+ request.getServerName() + ":" + request.getServerPort() + path + "/setCookie&gotoURL=" + gotoURL;
-		Cookie cookie = CookieUtil.getCookieByName(request, AuthConf.COOKIE_NAME);
-		if (cookie != null) {
-			//authCookie(request, response, cookie, URL);
-		} else {
-			response.sendRedirect(URL);
-		}
+		
 		if (!(handler instanceof HandlerMethod)) {
 		    return true;
 		}
@@ -88,6 +75,25 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 			return true;
 		}
 		
+		String path = request.getContextPath();
+		String gotoURL = request.getParameter("gotoURL");
+		if (gotoURL == null) {
+			gotoURL = request.getRequestURL().toString();
+		}
+		String URL = AuthConf.SSO_SERVICE + "preLogin?setCookieURL=" + request.getScheme() + "://"
+				+ request.getServerName() + ":" + request.getServerPort() + path + "/setCookie&gotoURL=" + gotoURL;
+		Cookie cookie = CookieUtil.getCookieByName(request, AuthConf.COOKIE_NAME);
+		if (cookie != null) {
+			//authCookie(request, response, cookie, URL);
+		} else {
+			response.sendRedirect(URL);
+			if (AuthorityType.SECURITY.equals(type)) {
+				return false;
+			} 
+			return true;
+		}
+		
+		
 		//User user = SecurityUtil.currentLogin();
 		User user = authCookie(request, response, cookie, URL);
 		
@@ -95,30 +101,6 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 			return _reponseAuthenticationError(response);
 		}
 		return true;
-	}
-	private void setCookie(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Cookie cookie = new Cookie(AuthConf.COOKIE_NAME, request.getParameter("token"));
-		cookie.setPath("/");
-		cookie.setMaxAge(Integer.parseInt(request.getParameter("expiry")));
-		response.addCookie(cookie);
-
-		String gotoURL = request.getParameter("gotoURL");
-		if (gotoURL != null){
-			response.sendRedirect(gotoURL);
-		}
-	}
-
-	private void doLogout(HttpServletRequest request, HttpServletResponse response, Cookie cookie,
-			String URL) throws IOException, ServletException {
-		NameValuePair[] params = new NameValuePair[1];
-		params[0] = new NameValuePair("cookieName", cookie.getValue());
-		try {
-			post(request, response, params, "doLogout");
-		} catch (JSONException e) {
-			throw new RuntimeException(e);
-		} finally {
-			response.sendRedirect(URL);
-		}
 	}
 	private User authCookie(HttpServletRequest request, HttpServletResponse response, Cookie cookie,
 			String URL) throws IOException, ServletException {
@@ -130,9 +112,10 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 			if (result.getBoolean("error")) {
 				response.sendRedirect(URL);
 			} else {
-				JSONObject jsonObj = new JSONObject(result);
-				JSONObject u = jsonObj.getJSONObject("user");
-				ObjectMapper mapper = new ObjectMapper();  
+				JSONObject u = result.getJSONObject("user");
+				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.sss");  
+				ObjectMapper mapper = new ObjectMapper();
+				mapper.setDateFormat(fmt);
 				user = mapper.readValue(u.toString(), User.class);
 			}
 		} catch (JSONException e) {

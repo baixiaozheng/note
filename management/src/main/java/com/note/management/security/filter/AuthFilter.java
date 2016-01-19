@@ -21,17 +21,14 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.web.method.HandlerMethod;
 
 import com.note.common.AuthConf;
-import com.note.management.security.annotation.Authority;
-import com.note.management.security.common.AuthorityType;
 
 
 /**
  * Servlet Filter implementation class AuthFilter
  */
-@WebFilter(filterName="/AuthFilter",urlPatterns="/*")
+@WebFilter(filterName="/AuthFilter",urlPatterns = { "/setCookie","/logout" })
 public class AuthFilter implements Filter {
 
 	/**
@@ -119,7 +116,7 @@ public class AuthFilter implements Filter {
 			if (result.getBoolean("error")) {
 				response.sendRedirect(URL);
 			} else {
-				request.setAttribute("username", result.getString("username"));
+				//request.setAttribute("username", result.getString("username"));
 				chain.doFilter(request, response);
 			}
 		} catch (JSONException e) {
