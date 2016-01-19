@@ -13,6 +13,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONObject;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Controller;
@@ -59,23 +60,26 @@ public class AuthController {
 	
 	@RequestMapping(value = "authToken")
 	public void authToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		StringBuilder result = new StringBuilder("{");
+		StringBuilder result = new StringBuilder("");
 		PrintWriter out = response.getWriter();
 		String encodedToken = request.getParameter("cookieName");
 		if(encodedToken == null) {
-			result.append("\"error\":true,\"errorInfo\":\"Token can not be empty!\"");
+			result.append("{\"error\":true,\"errorInfo\":\"Token can not be empty!\"}");
 		} else {
 			String decodedToken = DESUtils.decrypt(encodedToken, AuthConf.SECRET_KEY);
 			userOperations = redisTemplate.opsForValue();
 			User user = userOperations.get(decodedToken);
 			if (user != null) {// 判断token是否存在
-				result.append("\"error\":false,\"username\":").append(user.getRealName());
+				
+				JSONObject userjson = new JSONObject(user);
+				//result.append("{\"error\":false,\"username\":").append(user.getRealName()+"}");
+				result.append("{\"error\":false,\"errorInfo\":\"Token is not found!\",\"user\":" + userjson.toString() + "}");
+				result.append(userjson.toString());
 			}
 			else {
-				result.append("\"error\":true,\"errorInfo\":\"Token is not found!\"");
+				result.append("{\"error\":true,\"errorInfo\":\"Token is not found!\"}");
 			}
 		}
-		result.append("}");
 		out.print(result);
 	}
 	

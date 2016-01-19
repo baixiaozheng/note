@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.note.common.AuthConf;
 import com.note.common.HTTPCodeStatus;
 import com.note.management.entity.ResponseEntity;
@@ -88,11 +89,11 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 		}
 		
 		//User user = SecurityUtil.currentLogin();
+		User user = authCookie(request, response, cookie, URL);
 		
-		
-//		if (null == user) {
-//			return _reponseAuthenticationError(response);
-//		}
+		if (null == user) {
+			return _reponseAuthenticationError(response);
+		}
 		return true;
 	}
 	private void setCookie(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -119,8 +120,9 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 			response.sendRedirect(URL);
 		}
 	}
-	private void authCookie(HttpServletRequest request, HttpServletResponse response, Cookie cookie,
+	private User authCookie(HttpServletRequest request, HttpServletResponse response, Cookie cookie,
 			String URL) throws IOException, ServletException {
+		User user = null;
 		NameValuePair[] params = new NameValuePair[1];
 		params[0] = new NameValuePair("cookieName", cookie.getValue());
 		try {
@@ -128,13 +130,16 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 			if (result.getBoolean("error")) {
 				response.sendRedirect(URL);
 			} else {
-//				request.setAttribute("username", result.getString("username"));
-//				chain.doFilter(request, response);
+				JSONObject jsonObj = new JSONObject(result);
+				JSONObject u = jsonObj.getJSONObject("user");
+				ObjectMapper mapper = new ObjectMapper();  
+				user = mapper.readValue(u.toString(), User.class);
 			}
 		} catch (JSONException e) {
 			response.sendRedirect(URL);
 			throw new RuntimeException(e);
 		}
+		return user;
 	}
 
 	private JSONObject post(HttpServletRequest request, HttpServletResponse response, 
