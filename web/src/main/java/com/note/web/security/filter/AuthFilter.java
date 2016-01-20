@@ -1,4 +1,4 @@
-package com.note.web.filter;
+package com.note.web.security.filter;
 
 import java.io.IOException;
 import java.util.HashMap;

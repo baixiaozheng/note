@@ -45,7 +45,7 @@ public class NoteController extends BaseController {
     @RequestMapping(method = RequestMethod.POST)
     @Authority(type = AuthorityType.SECURITY)
     private ResponseEntity add(Note note){
-        User user = SecurityUtil.currentLogin();
+        User user = SecurityUtil.currentLogin(request,response);
         note.setUserId(user.getId());
         note = noteService.add(note);
         return returnSuccess(HTTPCodeStatus.HTTPCODE_OK);
@@ -63,7 +63,7 @@ public class NoteController extends BaseController {
     @RequestMapping(method = RequestMethod.GET)
     @Authority(type = AuthorityType.SECURITY)
     public ResponseEntity list(Page page, Note note){
-    	note.setUserId(SecurityUtil.currentLogin().getId());
+    	note.setUserId(SecurityUtil.currentLogin(request,response).getId());
     	page = noteService.list(page, note);
     	return returnSuccess(HTTPCodeStatus.HTTPCODE_OK, page);
     }
@@ -95,7 +95,7 @@ public class NoteController extends BaseController {
     @RequestMapping(value="/{id}", method = RequestMethod.PUT)
     @Authority(type = AuthorityType.SECURITY)
     public ResponseEntity update(@PathVariable("id") Integer id, Note note){
-    	Integer userId = SecurityUtil.currentLogin().getId();
+    	Integer userId = SecurityUtil.currentLogin(request,response).getId();
     	Note old = noteService.getById(id);
     	if(!old.getUserId().equals(userId)){
     		return returnFailed(301, "只允许更新自己的");

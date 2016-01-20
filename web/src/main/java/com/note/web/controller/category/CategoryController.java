@@ -43,7 +43,7 @@ public class CategoryController extends BaseController {
 	@RequestMapping(method = RequestMethod.GET)
 	@Authority(type = AuthorityType.SECURITY)
 	public ResponseEntity listByUser(){
-		User user = SecurityUtil.currentLogin();
+		User user = SecurityUtil.currentLogin(request,response);
 		int id = user.getId();
 		List<Category> categories = categoryService.listByUserId(id);
 		page.setResult(categories);

@@ -57,7 +57,7 @@ public class LoginController extends BaseController {
 	@RequestMapping(value="loginSuccess")
 	@ResponseBody
 	public ResponseEntity loginSuccess(HttpServletRequest request) {
-		User user = SecurityUtil.currentLogin();
+		User user = SecurityUtil.currentLogin(request,response);
 		user = userService.getById(user.getId());
 		user.setLastestLoginTime(new Date());
 		user.setLastestLoginIp(RequestUtil.getRemoteIPAddress(request));
@@ -75,7 +75,7 @@ public class LoginController extends BaseController {
 	@ResponseBody
 	@Authority(type = AuthorityType.SECURITY)
 	public ResponseEntity getNickname(){
-		User user = SecurityUtil.currentLogin();
+		User user = SecurityUtil.currentLogin(request,response);
 		return returnSuccess(user.getNickname());
 	}
 }

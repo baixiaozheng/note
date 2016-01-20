@@ -40,7 +40,7 @@ public class TagController extends BaseController {
 	@RequestMapping(method = RequestMethod.GET)
 	@Authority(type = AuthorityType.SECURITY)
 	public ResponseEntity listByUser(){
-		User user = SecurityUtil.currentLogin();
+		User user = SecurityUtil.currentLogin(request,response);
 		int id = user.getId();
 		List<Tag> tags = tagService.listByUserId(id);
 		page.setResult(tags);
