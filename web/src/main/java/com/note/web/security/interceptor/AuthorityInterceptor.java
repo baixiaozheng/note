@@ -30,7 +30,6 @@ import com.note.web.entity.ResponseEntity;
 import com.note.web.security.annotation.Authority;
 import com.note.web.security.common.AuthorityType;
 
-
 /**
  * 权限控制类
  *
@@ -46,9 +45,8 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see org.springframework.web.servlet.handler.HandlerInterceptorAdapter#
-	 * preHandle (javax.servlet.http.HttpServletRequest,
-	 * javax.servlet.http.HttpServletResponse, java.lang.Object)
+	 * @see org.springframework.web.servlet.handler.HandlerInterceptorAdapter# preHandle
+	 * (javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, java.lang.Object)
 	 */
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -59,9 +57,9 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 				|| uri.contains("/html") || uri.contains("/index.html") || uri.contains("/login")) {
 			return true;
 		}
-		
+
 		if (!(handler instanceof HandlerMethod)) {
-		    return true;
+			return true;
 		}
 		HandlerMethod mHandler = (HandlerMethod) handler;
 		Authority authority = mHandler.getMethodAnnotation(Authority.class);
@@ -74,7 +72,7 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 		if (AuthorityType.ANYMOUS.equals(type)) {
 			return true;
 		}
-		
+
 		String path = request.getContextPath();
 		String gotoURL = request.getParameter("gotoURL");
 		if (gotoURL == null) {
@@ -84,36 +82,43 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 				+ request.getServerName() + ":" + request.getServerPort() + path + "/setCookie&gotoURL=" + gotoURL;
 		Cookie cookie = CookieUtil.getCookieByName(request, AuthConf.COOKIE_NAME);
 		if (cookie != null) {
-			//authCookie(request, response, cookie, URL);
+			// authCookie(request, response, cookie, URL);
 		} else {
-			response.sendRedirect(URL);
+			
 			if (AuthorityType.SECURITY.equals(type)) {
-				return false;
-			} 
-			return true;
+				return _reponseAuthenticationError(response,URL);
+			} else {
+				response.sendRedirect(URL);
+				return true;
+			}
+			
 		}
-		
-		
-		//User user = SecurityUtil.currentLogin();
+
+		// User user = SecurityUtil.currentLogin();
 		User user = authCookie(request, response, cookie, URL);
-		
+
 		if (null == user) {
-			return _reponseAuthenticationError(response);
+			return _reponseAuthenticationError(response,URL);
 		}
 		return true;
 	}
-	private User authCookie(HttpServletRequest request, HttpServletResponse response, Cookie cookie,
-			String URL) throws IOException, ServletException {
+
+	private User authCookie(HttpServletRequest request, HttpServletResponse response, Cookie cookie, String URL)
+			throws IOException, ServletException {
 		User user = null;
 		NameValuePair[] params = new NameValuePair[1];
 		params[0] = new NameValuePair("cookieName", cookie.getValue());
 		try {
 			JSONObject result = post(request, response, params, "authToken");
 			if (result.getBoolean("error")) {
-				response.sendRedirect(URL);
+				if(isAjax(request)){
+					//_reponseAuthenticationError(response,URL);
+				} else {
+					response.sendRedirect(URL);
+				}
 			} else {
 				JSONObject u = result.getJSONObject("user");
-				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.sss");  
+				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.sss");
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setDateFormat(fmt);
 				user = mapper.readValue(u.toString(), User.class);
@@ -125,8 +130,8 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 		return user;
 	}
 
-	private JSONObject post(HttpServletRequest request, HttpServletResponse response, 
-			NameValuePair[] params, String method) throws IOException, ServletException, JSONException {
+	private JSONObject post(HttpServletRequest request, HttpServletResponse response, NameValuePair[] params,
+			String method) throws IOException, ServletException, JSONException {
 		HttpClient httpClient = new HttpClient();
 		PostMethod postMethod = new PostMethod(AuthConf.SSO_SERVICE + method);
 		postMethod.addParameters(params);
@@ -138,6 +143,7 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 			return null;
 		}
 	}
+
 	/**
 	 * Print authentication error message
 	 *
@@ -145,17 +151,21 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 	 * @return
 	 */
 	@SuppressWarnings({ "unused", "rawtypes" })
-	private boolean _reponseAuthenticationError(HttpServletResponse response) {
+	private boolean _reponseAuthenticationError(HttpServletResponse response, String url) {
 		int errorCode = HTTPCodeStatus.HTTPCODE_USER_NOTLOGIN;
 		String httpResponseMessage = HTTPCodeStatus.HTTPCODE_USER_NOTLOGIN_MESSAGE;
 		LOG.info("response msg: " + httpResponseMessage);
+		String gotoURL = url.substring(url.indexOf("gotoURL"));
+		String toURL = "gotoURL=/html/admin/index.html";
+		url=url.replace(gotoURL, toURL);
 		try {
 			ResponseEntity re = new ResponseEntity(errorCode, null, httpResponseMessage);
 			response.addHeader(errorCode + "", URLEncoder.encode(httpResponseMessage, "UTF-8"));
 			response.addHeader("Content-Type", "application/json; charset=utf-8");
 			String code = "\"code\" : " + "\"" + errorCode + "\"";
 			String msg = "\"message\" : \"" + httpResponseMessage + "\"";
-			String result = "{" + code + "," + msg + "}";
+			String u = "\"url\" : \"" + url + "\"";
+			String result = "{" + code + "," + msg + "," + u + "}";
 			LOG.info("result: " + result);
 			response.getWriter().write(result);
 			response.getWriter().flush();
@@ -168,4 +178,21 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 		return false;
 	}
 
+	/**
+	 * 判断ajax请求
+	 * 
+	 * @param request
+	 * @return
+	 */
+	boolean isAjax(HttpServletRequest request) {
+		return (request.getHeader("X-Requested-With") != null
+				&& "XMLHttpRequest".equals(request.getHeader("X-Requested-With").toString()));
+	}
+	
+	public static void main(String[] args) {
+		String s = "http://192.168.0.11:8888/auth/preLogin?setCookieURL=http://192.168.0.51:8080/web/setCookie&gotoURL=http://192.168.0.51:8080/web/getNickname";
+		String gotoURL = s.substring(s.indexOf("gotoURL"));
+		String toURL = "gotoURL=/html/admin/index.html";
+		System.out.println(s.replace(gotoURL, toURL));
+	}
 }

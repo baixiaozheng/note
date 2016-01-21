@@ -1,6 +1,7 @@
 
 package com.note.common;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Page {
@@ -13,7 +14,7 @@ public class Page {
 
 	private long totalCount;// 总记录数
 
-	private List<?> result;// 结果集
+	private List<?> result = new ArrayList<>();// 结果集
 
 	public Page() {
 

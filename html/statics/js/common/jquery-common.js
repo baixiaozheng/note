@@ -19,7 +19,7 @@
 			}) {
 				options.onLoadSuccess = function(r) {
 					if (r.code == 201) {
-						window.location.href = '/html/login.html';
+						window.location.href = r.url;
 						return;
 					} else if (r.code != 200) {
 						//判断code类型，做相应处理
@@ -234,7 +234,7 @@
 				r = $.parseJSON(r);
 			}
 			if (r.code == 201) {
-				window.location.href = '/login.html';
+				window.location.href = r.url;
 				return;
 //			} else if (r.code == gm.httpCode.no_permission) {
 //				gm.alert({
@@ -265,7 +265,7 @@
 				r = $.parseJSON(r);
 			}
 			if (r.code == 201) {
-				window.location.href = '/login.html';
+				window.location.href = r.url;
 				return;
 //			} else if (r.code == gm.httpCode.no_permission) {
 //				gm.alert({
