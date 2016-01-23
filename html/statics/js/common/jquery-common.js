@@ -8,6 +8,7 @@
 		$.fn.commonbootstrapTable = function(options) {
 			var settings = {
 				method: 'get',
+				cache: false, // 不缓存
 				pagination: true,
 				clickToSelect: true,
 				sidePagination: "server",
