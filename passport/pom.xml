@@ -9,7 +9,7 @@
   </parent>
   <artifactId>passport</artifactId>
   <packaging>war</packaging>
-  <name>passport Maven Webapp</name>
+  <name>passport</name>
   <url>http://maven.apache.org</url>
   <dependencies>
   	<dependency>

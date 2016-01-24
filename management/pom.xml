@@ -9,7 +9,7 @@
   </parent>
   <artifactId>management</artifactId>
   <packaging>war</packaging>
-  <name>note-management Maven Webapp</name>
+  <name>management</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>

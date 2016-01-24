@@ -7,11 +7,9 @@
     <artifactId>note</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>com.note</groupId>
   <artifactId>html</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <packaging>war</packaging>
-  <name>note-html Maven Webapp</name>
+  <name>html</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
