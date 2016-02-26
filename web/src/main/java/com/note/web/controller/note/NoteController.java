@@ -123,16 +123,6 @@ public class NoteController extends BaseController {
         os.close();       
     }
     
-//    @RequestMapping(value="/exp/{id}", method = RequestMethod.GET)
-//    public void exp(HttpServletResponse response, @PathVariable("id") Integer id) throws IOException{
-//    	Map<String, Object> dataMap = new HashMap<String, Object>();  
-//    	Note note = noteService.getById(id);
-//    	dataMap.put("title", note.getTitle());
-//    	dataMap.put("date", note.getCreateTime());
-//    	dataMap.put("content", "1111111111");
-//    	DocumentUtil documentUtil = new DocumentUtil();
-//    	documentUtil.createDoc(dataMap, "/Users/baixiaozheng/Downloads/aa.doc");
-//    }
 
     @RequestMapping(value="/exppdf/{id}", method = RequestMethod.GET)
     public void expPDF(HttpServletResponse response, @PathVariable("id") Integer id) throws Exception{
